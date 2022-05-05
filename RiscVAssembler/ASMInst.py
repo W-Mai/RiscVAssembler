@@ -49,256 +49,167 @@ class ASMInstBase(object):
         return ""
 
 
-class ADD(ASMInstBase):
+class RTypeInst(ASMInstBase):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.inst_type = "R"
-        self.inst_name = "add"
-        self.inst_args = ["rd", "rs1", "rs2"]
-
-        self.opcode = 0b0110011
-        self.func3 = 0b000
-        self.func7 = 0b0000000
+        self.inst_type = 'R'
+        self.inst_name = 'RTypeInst'
+        self.inst_args = ['func7', 'func3', 'opcode', 'rd', 'rs1', 'rs2']
 
         self._build()
+
+        self.inst_args.remove('func7')
+        self.inst_args.remove('func3')
+        self.inst_args.remove('opcode')
+
+
+class ITypeInst(ASMInstBase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.inst_type = 'I'
+        self.inst_name = 'ITypeInst'
+        self.inst_args = ['func3', 'opcode', 'rd', 'rs1', 'imm']
+
+        self._build()
+
+        self.inst_args.remove('func3')
+        self.inst_args.remove('opcode')
+
+
+# ######################### RTypeInst ##########################################
+
+class ADD(RTypeInst):
+    def __init__(self, **kwargs):
+        super().__init__(func7=0b0000000, func3=0b000, opcode=0b0110011, **kwargs)
+        self.inst_name = 'add'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} + R{self.rs2}"
 
 
-class SUB(ASMInstBase):
+class SUB(RTypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "R"
-        self.inst_name = "sub"
-        self.inst_args = ["rd", "rs1", "rs2"]
-
-        self.opcode = 0b0110011
-        self.func3 = 0b000
-        self.func7 = 0b0100000
-
-        self._build()
+        super().__init__(func7=0b0100000, func3=0b000, opcode=0b0110011, **kwargs)
+        self.inst_name = 'sub'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} - R{self.rs2}"
 
 
-class XOR(ASMInstBase):
+class XOR(RTypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "R"
-        self.inst_name = "xor"
-        self.inst_args = ["rd", "rs1", "rs2"]
-
-        self.opcode = 0b0110011
-        self.func3 = 0b100
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func7=0b0000000, func3=0b100, opcode=0b0110011, **kwargs)
+        self.inst_name = 'xor'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} ^ R{self.rs2}"
 
 
-class OR(ASMInstBase):
+class OR(RTypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "R"
-        self.inst_name = "or"
-        self.inst_args = ["rd", "rs1", "rs2"]
-
-        self.opcode = 0b0110011
-        self.func3 = 0b110
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func7=0b0000000, func3=0b110, opcode=0b0110011, **kwargs)
+        self.inst_name = 'or'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} | R{self.rs2}"
 
 
-class AND(ASMInstBase):
+class AND(RTypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "R"
-        self.inst_name = "and"
-        self.inst_args = ["rd", "rs1", "rs2"]
-
-        self.opcode = 0b0110011
-        self.func3 = 0b111
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func7=0b0000000, func3=0b111, opcode=0b0110011, **kwargs)
+        self.inst_name = 'and'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} & R{self.rs2}"
 
 
-class SLL(ASMInstBase):
+class SLL(RTypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "R"
-        self.inst_name = "sll"
-        self.inst_args = ["rd", "rs1", "rs2"]
-
-        self.opcode = 0b0110011
-        self.func3 = 0b001
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func7=0b0000000, func3=0b001, opcode=0b0110011, **kwargs)
+        self.inst_name = 'sll'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} << R{self.rs2}"
 
 
-class SRL(ASMInstBase):
+class SRL(RTypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "R"
-        self.inst_name = "srl"
-        self.inst_args = ["rd", "rs1", "rs2"]
-
-        self.opcode = 0b0110011
-        self.func3 = 0b101
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func7=0b0000000, func3=0b101, opcode=0b0110011, **kwargs)
+        self.inst_name = 'srl'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} >> R{self.rs2}"
 
 
-class SRA(ASMInstBase):
+class SRA(RTypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "R"
-        self.inst_name = "sra"
-        self.inst_args = ["rd", "rs1", "rs2"]
-
-        self.opcode = 0b0110011
-        self.func3 = 0b101
-        self.func7 = 0b0100000
-
-        self._build()
+        super().__init__(func7=0b0100000, func3=0b101, opcode=0b0110011, **kwargs)
+        self.inst_name = 'sra'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} >> R{self.rs2}"
 
 
-class SLT(ASMInstBase):
+class SLT(RTypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "R"
-        self.inst_name = "slt"
-        self.inst_args = ["rd", "rs1", "rs2"]
-
-        self.opcode = 0b0110011
-        self.func3 = 0b010
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func7=0b0000000, func3=0b010, opcode=0b0110011, **kwargs)
+        self.inst_name = 'slt'
 
     def description(self):
         return f"R{self.rd} = (R{self.rs1} < R{self.rs2}) ? 1 : 0"
 
 
-class SLTU(ASMInstBase):
+class SLTU(RTypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "R"
-        self.inst_name = "sltu"
-        self.inst_args = ["rd", "rs1", "rs2"]
-
-        self.opcode = 0b0110011
-        self.func3 = 0b011
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func7=0b0000000, func3=0b011, opcode=0b0110011, **kwargs)
+        self.inst_name = 'sltu'
 
     def description(self):
         return f"R{self.rd} = (R{self.rs1} < R{self.rs2}) ? 1 : 0"
 
 
-class ADDI(ASMInstBase):
+# ######################### ITypeInst ##########################################
+
+class ADDI(ITypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "I"
-        self.inst_name = "addi"
-        self.inst_args = ["rd", "rs1", "imm"]
-
-        self.opcode = 0b0010011
-        self.func3 = 0b000
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func3=0b000, opcode=0b0010011, **kwargs)
+        self.inst_name = 'addi'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} + {self.imm}"
 
 
-class XORI(ASMInstBase):
+class XORI(ITypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "I"
-        self.inst_name = "xori"
-        self.inst_args = ["rd", "rs1", "imm"]
-
-        self.opcode = 0b0010011
-        self.func3 = 0b100
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func3=0b100, opcode=0b0010011, **kwargs)
+        self.inst_name = 'xori'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} ^ {self.imm}"
 
 
-class ORI(ASMInstBase):
+class ORI(ITypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "I"
-        self.inst_name = "ori"
-        self.inst_args = ["rd", "rs1", "imm"]
-
-        self.opcode = 0b0010011
-        self.func3 = 0b110
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func3=0b110, opcode=0b0010011, **kwargs)
+        self.inst_name = 'ori'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} | {self.imm}"
 
 
-class ANDI(ASMInstBase):
+class ANDI(ITypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "I"
-        self.inst_name = "andi"
-        self.inst_args = ["rd", "rs1", "imm"]
-
-        self.opcode = 0b0010011
-        self.func3 = 0b111
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func3=0b111, opcode=0b0010011, **kwargs)
+        self.inst_name = 'andi'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} & {self.imm}"
 
 
-class SLLI(ASMInstBase):
+class SLLI(ITypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "I"
-        self.inst_name = "slli"
-        self.inst_args = ["rd", "rs1", "imm"]
-
-        self.opcode = 0b0010011
-        self.func3 = 0b001
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func3=0b001, opcode=0b0010011, **kwargs)
+        self.inst_name = 'slli'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} << {self.imm}"
@@ -308,18 +219,10 @@ class SLLI(ASMInstBase):
         self.imm = 0b000_0000_11111 & self.imm
 
 
-class SRLI(ASMInstBase):
+class SRLI(ITypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "I"
-        self.inst_name = "srli"
-        self.inst_args = ["rd", "rs1", "imm"]
-
-        self.opcode = 0b0010011
-        self.func3 = 0b101
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func3=0b101, opcode=0b0010011, **kwargs)
+        self.inst_name = 'srli'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} >> {self.imm}"
@@ -329,18 +232,10 @@ class SRLI(ASMInstBase):
         self.imm = 0b000_0000_11111 & self.imm
 
 
-class SRAI(ASMInstBase):
+class SRAI(ITypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "I"
-        self.inst_name = "srai"
-        self.inst_args = ["rd", "rs1", "imm"]
-
-        self.opcode = 0b0010011
-        self.func3 = 0b101
-        self.func7 = 0b0100000
-
-        self._build()
+        super().__init__(func3=0b101, opcode=0b0010011, **kwargs)
+        self.inst_name = 'srai'
 
     def description(self):
         return f"R{self.rd} = R{self.rs1} >> {self.imm}"
@@ -352,35 +247,19 @@ class SRAI(ASMInstBase):
         return bits
 
 
-class SLTI(ASMInstBase):
+class SLTI(ITypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "I"
-        self.inst_name = "slti"
-        self.inst_args = ["rd", "rs1", "imm"]
-
-        self.opcode = 0b0010011
-        self.func3 = 0b010
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func3=0b010, opcode=0b0010011, **kwargs)
+        self.inst_name = 'slti'
 
     def description(self):
         return f"R{self.rd} = (R{self.rs1} < {self.imm}) ? 1 : 0"
 
 
-class SLTIU(ASMInstBase):
+class SLTIU(ITypeInst):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.inst_type = "I"
-        self.inst_name = "sltiu"
-        self.inst_args = ["rd", "rs1", "imm"]
-
-        self.opcode = 0b0010011
-        self.func3 = 0b011
-        self.func7 = 0b0000000
-
-        self._build()
+        super().__init__(func3=0b011, opcode=0b0010011, **kwargs)
+        self.inst_name = 'sltiu'
 
     def description(self):
         return f"R{self.rd} = (R{self.rs1} < {self.imm}) ? 1 : 0"
