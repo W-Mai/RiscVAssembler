@@ -20,6 +20,8 @@ class ASMInstBase(object):
             val = self._kwargs.get(arg, None)
             if val is None:
                 raise Exception("Argument %s is not provided." % arg)
+            if not self._validator(arg)(val):
+                raise Exception("Argument %s is invalid." % arg)
             setattr(self, arg, val)
 
     def bitcode(self, bit_sep=''):
@@ -48,32 +50,49 @@ class ASMInstBase(object):
     def description(self):
         return ""
 
+    def _validator(self, arg_name) -> "(x: Any) -> bool":
+        return lambda x: True
+
 
 class RTypeInst(ASMInstBase):
-    def __init__(self, **kwargs):
+    def __init__(self, opcode, func3, func7, **kwargs):
         super().__init__(**kwargs)
         self.inst_type = 'R'
         self.inst_name = 'RTypeInst'
-        self.inst_args = ['func7', 'func3', 'opcode', 'rd', 'rs1', 'rs2']
+        self.inst_args = ['rd', 'rs1', 'rs2']
+
+        self.opcode = opcode
+        self.func3 = func3
+        self.func7 = func7
 
         self._build()
 
-        self.inst_args.remove('func7')
-        self.inst_args.remove('func3')
-        self.inst_args.remove('opcode')
+    def _validator(self, arg_name) -> "(x: Any) -> bool":
+        return {
+            'rd': lambda x: 0 <= x <= 31,
+            'rs1': lambda x: 0 <= x <= 31,
+            'rs2': lambda x: 0 <= x <= 31,
+        }[arg_name]
 
 
 class ITypeInst(ASMInstBase):
-    def __init__(self, **kwargs):
+    def __init__(self, opcode, func3, **kwargs):
         super().__init__(**kwargs)
         self.inst_type = 'I'
         self.inst_name = 'ITypeInst'
-        self.inst_args = ['func3', 'opcode', 'rd', 'rs1', 'imm']
+        self.inst_args = ['rd', 'rs1', 'imm']
+
+        self.opcode = opcode
+        self.func3 = func3
 
         self._build()
 
-        self.inst_args.remove('func3')
-        self.inst_args.remove('opcode')
+    def _validator(self, arg_name) -> "(x: Any) -> bool":
+        return {
+            'rd': lambda x: 0 <= x <= 31,
+            'rs1': lambda x: 0 <= x <= 31,
+            'imm': lambda x: -2048 <= x <= 2047 or 0 <= x <= 4095,
+        }[arg_name]
 
 
 # ######################### RTypeInst ##########################################
