@@ -29,7 +29,7 @@ class ASMBlock(object, metaclass=ASMBlockMetaclass):
                 comment_sep='//',
                 need_description=False,
                 description_sep='|') -> str:
-        return "\n".join([inst.bitcode(bit_sep=bit_sep)
+        return "\n".join([f"{inst.bitcode(bit_sep=bit_sep):<38}"
                           + (f" {comment_sep} {inst.comment()}" if need_comment else "")
                           + (f" {description_sep} {inst.description()}" if need_description else "")
                           for inst in cls.INSTS])
