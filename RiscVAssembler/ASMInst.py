@@ -39,3 +39,19 @@ class ASMInstBase(object):
     def description(self):
         return ""
 
+
+class ADD(ASMInstBase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.inst_type = "R"
+        self.inst_name = "add"
+        self.inst_args = ["rd", "rs1", "rs2"]
+
+        self.opcode = 0b0110011
+        self.func3 = 0b000
+        self.func7 = 0b0000000
+
+        self._build()
+
+    def description(self):
+        return f"R{self.rd} = R{self.rs1} + R{self.rs2}"
