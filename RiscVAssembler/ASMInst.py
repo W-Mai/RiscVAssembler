@@ -237,6 +237,11 @@ class SLLI(ITypeInst):
         super()._build()
         self.imm = 0b000_0000_11111 & self.imm
 
+    def _validator(self, arg_name) -> "(x: Any) -> bool":
+        return {
+            'imm': lambda x: 0b000_0000_11111 & x == x
+        }.get(arg_name, super()._validator(arg_name))
+
 
 class SRLI(ITypeInst):
     def __init__(self, **kwargs):
@@ -249,6 +254,11 @@ class SRLI(ITypeInst):
     def _build(self):
         super()._build()
         self.imm = 0b000_0000_11111 & self.imm
+
+    def _validator(self, arg_name) -> "(x: Any) -> bool":
+        return {
+            'imm': lambda x: 0b000_0000_11111 & x == x
+        }.get(arg_name, super()._validator(arg_name))
 
 
 class SRAI(ITypeInst):
@@ -264,6 +274,11 @@ class SRAI(ITypeInst):
         bits = super().bitcode(bit_sep)
         self.imm = self.imm & 0b000_0000_11111
         return bits
+
+    def _validator(self, arg_name) -> "(x: Any) -> bool":
+        return {
+            'imm': lambda x: 0b000_0000_11111 & x == x
+        }.get(arg_name, super()._validator(arg_name))
 
 
 class SLTI(ITypeInst):
