@@ -5,19 +5,22 @@
 # Created Time:  2022-05-05
 #############################################
 
-from RiscVAssembler.ASMInst import ASMInstBase, ADD
+from RiscVAssembler.ASMInst import ASMInstBase, ADD, SUB, XOR, OR, AND, SLL, SRL, SRA, SLT, SLTU
 from RiscVAssembler.ASMBlock import ASMBlock
 
 
 class ASMFile(ASMBlock):
     INSTS = [
         ADD(rd=29, rs1=27, rs2=28),
-        ADD(rd=29, rs1=27, rs2=29),
-        ADD(rd=29, rs1=27, rs2=29),
-        ADD(rd=29, rs1=27, rs2=29),
-        ADD(rd=29, rs1=27, rs2=29),
-        ADD(rd=29, rs1=27, rs2=29),
-        ADD(rd=29, rs1=27, rs2=29),
+        SUB(rd=29, rs1=27, rs2=29),
+        XOR(rd=29, rs1=27, rs2=29),
+        OR(rd=29, rs1=27, rs2=29),
+        AND(rd=29, rs1=27, rs2=29),
+        SLL(rd=29, rs1=27, rs2=29),
+        SRL(rd=29, rs1=27, rs2=29),
+        SRA(rd=29, rs1=27, rs2=29),
+        SLT(rd=29, rs1=27, rs2=29),
+        SLTU(rd=29, rs1=27, rs2=29),
     ]
 
 
