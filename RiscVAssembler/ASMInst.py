@@ -33,18 +33,27 @@ class ASMInstBase(object):
                 f"{self.func3:03b}",
                 f"{self.rd:05b}",
                 f"{self.opcode:07b}"])
-        if self.inst_type == 'I':
+        elif self.inst_type == 'I':
             return bit_sep.join([
                 f"{self.imm:012b}",
                 f"{self.rs1:05b}",
                 f"{self.func3:03b}",
                 f"{self.rd:05b}",
                 f"{self.opcode:07b}"])
+        elif self.inst_type == 'J':
+            return bit_sep.join([
+                f"{self.imm:020b}",
+                f"{self.rd:05b}",
+                f"{self.opcode:07b}"])
+
+        return ""
 
     def comment(self):
         if self.inst_type == 'R':
             return f"{self.inst_name:8}" + '\t'.join([f"{inst}: {getattr(self, inst)}" for inst in self.inst_args])
         if self.inst_type == 'I':
+            return f"{self.inst_name:8}" + '\t'.join([f"{inst}: {getattr(self, inst)}" for inst in self.inst_args])
+        if self.inst_type == 'J':
             return f"{self.inst_name:8}" + '\t'.join([f"{inst}: {getattr(self, inst)}" for inst in self.inst_args])
 
     def description(self):
@@ -92,6 +101,33 @@ class ITypeInst(ASMInstBase):
             'rd': lambda x: 0 <= x <= 31,
             'rs1': lambda x: 0 <= x <= 31,
             'imm': lambda x: -2048 <= x <= 2047 or 0 <= x <= 4095,
+        }[arg_name]
+
+
+class JTypeInst(ASMInstBase):
+    def __init__(self, opcode, **kwargs):
+        super().__init__(**kwargs)
+        self.inst_type = 'J'
+        self.inst_name = 'JTypeInst'
+        self.inst_args = ['rd', 'imm']
+
+        self.opcode = opcode
+
+        self._build()
+
+        self.imm_ = self.imm
+        self.imm = (self.imm & 0b111111111111111111111) >> 1
+        part4 = (self.imm & 0b10000000000000000000) >> 19 << 19
+        part3 = (self.imm & 0b01111111100000000000) >> 11
+        part2 = (self.imm & 0b00000000010000000000) >> 10 << 8
+        part1 = (self.imm & 0b00000000001111111111) << 9
+
+        self.imm = part4 | part1 | part2 | part3
+
+    def _validator(self, arg_name) -> "(x: Any) -> bool":
+        return {
+            'rd': lambda x: 0 <= x <= 31,
+            'imm': lambda x: -2 ** 19 <= x <= 2 ** 19 - 1 or 0 <= x <= 2 ** 20 - 1,
         }[arg_name]
 
 
@@ -297,3 +333,14 @@ class SLTIU(ITypeInst):
 
     def description(self):
         return f"R{self.rd} = (R{self.rs1} < {self.imm}) ? 1 : 0"
+
+
+# ######################### JTypeInst ##########################################
+
+class JAL(JTypeInst):
+    def __init__(self, **kwargs):
+        super().__init__(opcode=0b1101111, **kwargs)
+        self.inst_name = 'jal'
+
+    def description(self):
+        return f"R{self.rd} = PC {'+' if self.imm_ >= 0 else '-'} {abs(self.imm_)}; PC += {self.imm_}"
