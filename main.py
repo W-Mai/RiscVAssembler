@@ -10,7 +10,7 @@ from RiscVAssembler.ASMInst import (
     ADD, SUB, XOR, OR, AND, SLL, SRL, SRA, SLT, SLTU,
     ADDI, XORI, ORI, ANDI, SLLI, SRLI, SRAI, SLTI, SLTIU,
 
-    JAL
+    JAL, JALR
 )
 from RiscVAssembler.ASMBlock import ASMBlock
 
@@ -48,6 +48,7 @@ class AddLoop(ASMBlock):
         ADDI(rd=29, rs1=0, imm=2),
         ADDI(rd=29, rs1=29, imm=1),
         JAL(rd=0, imm=-4),
+        JALR(rd=0, rs1=29, imm=-4),
     ]
 
 

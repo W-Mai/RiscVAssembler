@@ -96,6 +96,8 @@ class ITypeInst(ASMInstBase):
 
         self._build()
 
+        self.imm = self.imm & 0xfff
+
     def _validator(self, arg_name) -> "(x: Any) -> bool":
         return {
             'rd': lambda x: 0 <= x <= 31,
@@ -335,6 +337,15 @@ class SLTIU(ITypeInst):
         return f"R{self.rd} = (R{self.rs1} < {self.imm}) ? 1 : 0"
 
 
+class JALR(ITypeInst):
+    def __init__(self, **kwargs):
+        super().__init__(func3=0b000, opcode=0b1100111, **kwargs)
+        self.inst_name = 'jalr'
+
+    def description(self):
+        return f"R{self.rd} = PC + 4; PC = R{self.rs1} + {self.imm}"
+
+
 # ######################### JTypeInst ##########################################
 
 class JAL(JTypeInst):
@@ -343,4 +354,4 @@ class JAL(JTypeInst):
         self.inst_name = 'jal'
 
     def description(self):
-        return f"R{self.rd} = PC {'+' if self.imm_ >= 0 else '-'} {abs(self.imm_)}; PC += {self.imm_}"
+        return f"R{self.rd} = PC +4 ; PC += {self.imm_}"
