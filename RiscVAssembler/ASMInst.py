@@ -40,6 +40,11 @@ class ASMInstBase(object):
                 f"{self.func3:03b}",
                 f"{self.rd:05b}",
                 f"{self.opcode:07b}"])
+        elif self.inst_type == 'U':
+            return bit_sep.join([
+                f"{self.imm:020b}",
+                f"{self.rd:05b}",
+                f"{self.opcode:07b}"])
         elif self.inst_type == 'J':
             return bit_sep.join([
                 f"{self.imm:020b}",
@@ -52,6 +57,8 @@ class ASMInstBase(object):
         if self.inst_type == 'R':
             return f"{self.inst_name:8}" + '\t'.join([f"{inst}: {getattr(self, inst)}" for inst in self.inst_args])
         if self.inst_type == 'I':
+            return f"{self.inst_name:8}" + '\t'.join([f"{inst}: {getattr(self, inst)}" for inst in self.inst_args])
+        if self.inst_type == 'U':
             return f"{self.inst_name:8}" + '\t'.join([f"{inst}: {getattr(self, inst)}" for inst in self.inst_args])
         if self.inst_type == 'J':
             return f"{self.inst_name:8}" + '\t'.join([f"{inst}: {getattr(self, inst)}" for inst in self.inst_args])
@@ -103,6 +110,27 @@ class ITypeInst(ASMInstBase):
             'rd': lambda x: 0 <= x <= 31,
             'rs1': lambda x: 0 <= x <= 31,
             'imm': lambda x: -2048 <= x <= 2047 or 0 <= x <= 4095,
+        }[arg_name]
+
+
+class UTypeInst(ASMInstBase):
+    def __init__(self, opcode, **kwargs):
+        super().__init__(**kwargs)
+        self.inst_type = 'U'
+        self.inst_name = 'UTypeInst'
+        self.inst_args = ['rd', 'imm']
+
+        self.opcode = opcode
+
+        self._build()
+
+        self.imm_ = self.imm << 12
+        self.imm = self.imm & 0xfffff
+
+    def _validator(self, arg_name) -> "(x: Any) -> bool":
+        return {
+            'rd': lambda x: 0 <= x <= 31,
+            'imm': lambda x: -2 ** 19 <= x <= 2 ** 19 - 1 or 0 <= x <= 2 ** 20 - 1,
         }[arg_name]
 
 
@@ -355,3 +383,23 @@ class JAL(JTypeInst):
 
     def description(self):
         return f"R{self.rd} = PC +4 ; PC += {self.imm_}"
+
+
+# ######################### UTypeInst ##########################################
+
+class LUI(UTypeInst):
+    def __init__(self, **kwargs):
+        super().__init__(opcode=0b0110111, **kwargs)
+        self.inst_name = 'lui'
+
+    def description(self):
+        return f"R{self.rd} = {self.imm_}"
+
+
+class AUIPC(UTypeInst):
+    def __init__(self, **kwargs):
+        super().__init__(opcode=0b0010111, **kwargs)
+        self.inst_name = 'auipc'
+
+    def description(self):
+        return f"R{self.rd} = PC + {self.imm_}"
